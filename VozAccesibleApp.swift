@@ -1,19 +1,36 @@
 
 import SwiftUI
 import FirebaseCore
+import FirebaseAuth
 
-// Punto de entrada de la aplicación Voz Accesible.
 @main
 struct VozAccesibleApp: App {
 
-    // Inicialización de Firebase al iniciar la aplicación.
+    @State private var usuarioAutenticado: Bool =
+        Auth.auth().currentUser != nil
+
     init() {
         FirebaseApp.configure()
     }
 
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            Group {
+                if usuarioAutenticado {
+                    ContentView()
+                } else {
+                    LoginView()
+                }
+            }
+            .onAppear {
+                verificarSesion()
+            }
         }
+    }
+
+    // Verifica si existe una sesión activa.
+    func verificarSesion() {
+        usuarioAutenticado =
+            Auth.auth().currentUser != nil
     }
 }
