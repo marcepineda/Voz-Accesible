@@ -1,47 +1,65 @@
 
 import SwiftUI
-import AVFoundation
 
 struct ContentView: View {
 
-    // MARK: - Variables
-    @State private var textoMensaje: String = ""
-    @State private var mensajeReproducido: Bool = false
-
-    // Sintetizador de voz
-    private let sintetizador = AVSpeechSynthesizer()
-
-    // MARK: - Interfaz principal
     var body: some View {
+        TabView {
+
+            // Pantalla de comunicación
+            pantallaPrincipal
+                .tabItem {
+                    Image(systemName: "text.bubble.fill")
+                    Text("Comunicación")
+                }
+
+            // Frases frecuentes
+            FrasesView()
+                .tabItem {
+                    Image(systemName: "quote.bubble.fill")
+                    Text("Frases")
+                }
+
+            // Categorías de mensajes
+            CategoriasView()
+                .tabItem {
+                    Image(systemName: "square.grid.2x2.fill")
+                    Text("Categorías")
+                }
+
+            // Configuración
+            ConfiguracionView()
+                .tabItem {
+                    Image(systemName: "gearshape.fill")
+                    Text("Ajustes")
+                }
+        }
+        .tint(.blue)
+    }
+
+    var pantallaPrincipal: some View {
         NavigationView {
             VStack(spacing: 25) {
 
-                // Título de la aplicación
+                Image(systemName: "waveform.circle.fill")
+                    .font(.system(size: 80))
+                    .foregroundColor(.blue)
+
                 Text("Voz Accesible")
                     .font(.largeTitle)
                     .fontWeight(.bold)
                     .foregroundColor(.blue)
 
-                Text("Expresa tus ideas mediante la voz")
+                Text("Una forma sencilla de expresar tus ideas.")
                     .font(.subheadline)
                     .foregroundColor(.gray)
+                    .multilineTextAlignment(.center)
 
-                // Campo para escribir mensajes
-                TextEditor(text: $textoMensaje)
-                    .frame(height: 180)
-                    .padding(8)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 12)
-                            .stroke(Color.blue, lineWidth: 1)
-                    )
-
-                // Botón para reproducir el mensaje
-                Button(action: reproducirVoz) {
+                NavigationLink(destination: FrasesView()) {
                     Label(
-                        "Reproducir mensaje",
-                        systemImage: "speaker.wave.3.fill"
+                        "Frases frecuentes",
+                        systemImage: "quote.bubble.fill"
                     )
-                    .font(.headline)
                     .frame(maxWidth: .infinity)
                     .padding()
                     .background(Color.blue)
@@ -49,16 +67,26 @@ struct ContentView: View {
                     .cornerRadius(12)
                 }
 
-                // Botón para detener la voz
-                Button(action: detenerVoz) {
+                NavigationLink(destination: CategoriasView()) {
                     Label(
-                        "Detener reproducción",
-                        systemImage: "stop.fill"
+                        "Categorías de mensajes",
+                        systemImage: "square.grid.2x2.fill"
                     )
-                    .font(.headline)
                     .frame(maxWidth: .infinity)
                     .padding()
-                    .background(Color.red)
+                    .background(Color.green)
+                    .foregroundColor(.white)
+                    .cornerRadius(12)
+                }
+
+                NavigationLink(destination: ConfiguracionView()) {
+                    Label(
+                        "Configuración",
+                        systemImage: "gearshape.fill"
+                    )
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(Color.orange)
                     .foregroundColor(.white)
                     .cornerRadius(12)
                 }
@@ -66,41 +94,7 @@ struct ContentView: View {
                 Spacer()
             }
             .padding()
-            .navigationTitle("Comunicación")
+            .navigationTitle("Inicio")
         }
-    }
-
-    // MARK: - Función de síntesis de voz
-    func reproducirVoz() {
-
-        // Verifica que exista un mensaje
-        if textoMensaje.trimmingCharacters(
-            in: .whitespacesAndNewlines
-        ).isEmpty {
-            return
-        }
-
-        // Prepara el mensaje para convertirlo en voz
-        let mensaje = AVSpeechUtterance(
-            string: textoMensaje
-        )
-
-        // Configura el idioma español
-        mensaje.voice = AVSpeechSynthesisVoice(
-            language: "es-SV"
-        )
-
-        // Configura la velocidad de reproducción
-        mensaje.rate = AVSpeechUtteranceDefaultSpeechRate
-
-        // Reproduce el mensaje
-        sintetizador.speak(mensaje)
-    }
-
-    // MARK: - Función para detener la voz
-    func detenerVoz() {
-        sintetizador.stopSpeaking(
-            at: .immediate
-        )
     }
 }
